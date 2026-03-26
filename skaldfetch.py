@@ -149,8 +149,23 @@ def resolve_spotify(url: str, show_hint: str = "") -> tuple[str, str, str]:
             pass  # fall through to error below
 
     if not show_name:
+        # Fallback: search iTunes for the episode title — returns collectionName (show name)
+        try:
+            ep_search = requests.get(
+                "https://itunes.apple.com/search",
+                params={"term": episode_title, "entity": "podcastEpisode", "limit": 5},
+                timeout=10).json()
+            for r in ep_search.get("results", []):
+                candidate = r.get("collectionName", "").strip()
+                if candidate:
+                    show_name = candidate
+                    break
+        except Exception:
+            pass
+
+    if not show_name:
         raise ValueError(
-            "Kunne ikke finde podcast-navn fra Spotify-siden.\n"
+            "Kunne ikke finde podcast-navn automatisk.\n"
             "  Brug:  --show 'Podcast Name'  for at angive det manuelt.")
 
     print(f"  Show:     {show_name}")
