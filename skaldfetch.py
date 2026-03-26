@@ -354,7 +354,12 @@ def save_files(content: str, title: str) -> tuple[Path, Path | None]:
         try:
             BERTHA_INBOX.mkdir(parents=True, exist_ok=True)
             bertha_path = BERTHA_INBOX / filename
-            bertha_path.write_text(content, encoding="utf-8")
+            bertha_preamble = (
+                "> **Til Bertha** — Dette er en podcast/video-transskription fra SkjaldFetch.\n"
+                "> Lav et kort resumé med de vigtigste pointer og læg det i vores næste daglige opsamling.\n\n"
+                "---\n\n"
+            )
+            bertha_path.write_text(bertha_preamble + content, encoding="utf-8")
         except Exception as e:
             print(f"  (Bertha-skrivning fejlede: {e})")
 
